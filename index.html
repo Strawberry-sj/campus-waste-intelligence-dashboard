@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Campus Waste Intelligence Dashboard</title>
+<style>
+:root{--bg:#eef2f4;--card:#fff;--ink:#10242b;--mut:#5a6d75;--line:#d6dfe3;--acc:#0b7a75;--good:#1f8a4c;--mid:#c58a10;--bad:#c4412f;--c1:#3f9d5a;--c2:#d9a62e;--c3:#3b78c4;--c4:#8b95a0;--c5:#b9533f;--in:#f5f8f9;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d181d;--card:#15252c;--ink:#e6eff2;--mut:#93a8b0;--line:#27393f;--acc:#4cc2ba;--good:#52c27d;--mid:#e0b04a;--bad:#ee7a67;--c1:#59b877;--c2:#e6b94f;--c3:#6a9fe0;--c4:#a3acb6;--c5:#d67a66;--in:#0f1d23;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d181d;--card:#15252c;--ink:#e6eff2;--mut:#93a8b0;--line:#27393f;--acc:#4cc2ba;--good:#52c27d;--mid:#e0b04a;--bad:#ee7a67;--c1:#59b877;--c2:#e6b94f;--c3:#6a9fe0;--c4:#a3acb6;--c5:#d67a66;--in:#0f1d23;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.w{max-width:1120px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:flex-end;margin-bottom:14px}
+h1{font:700 26px/1.15 Georgia,"Times New Roman",serif;margin:4px 0 0}
+h2{font-size:16px;margin:0 0 10px}
+.tag{display:inline-block;font-size:12.5px;color:var(--acc);border:1px solid var(--acc);border-radius:99px;padding:1px 10px}
+.ctl{display:flex;gap:8px;flex-wrap:wrap}
+select,input,button,textarea{font:inherit;color:var(--ink);background:var(--in);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+button{cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.seg{display:flex}.seg button{border-radius:0;margin-left:-1px}.seg button:first-child{border-radius:8px 0 0 8px;margin:0}.seg button:last-child{border-radius:0 8px 8px 0}
+.seg .on,.pri{background:var(--acc);color:#fff;border-color:var(--acc)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
+.k{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.k b{display:block;font:700 26px/1.2 Georgia,serif}.k span{color:var(--mut);font-size:13px}.k i{font-style:normal;font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.r1{display:grid;gap:12px;grid-template-columns:minmax(0,2fr) minmax(0,1fr);margin-bottom:12px}
+.r2{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));margin-bottom:12px}
+@media(max-width:820px){.r1{grid-template-columns:1fr}}
+svg{width:100%;height:auto;display:block}svg text{fill:var(--mut);font-size:11px}
+.lg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;color:var(--mut);margin-bottom:6px}
+.lg s{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;text-decoration:none}
+.mut{color:var(--mut);font-size:13px;margin:8px 0 0}
+.lb{display:grid;grid-template-columns:minmax(0,1fr) 46px;gap:2px 8px;width:100%;text-align:left;background:none;border:0;padding:6px 4px;border-radius:6px}
+.lb:hover,.al:hover{background:var(--in)}.lb em{font-style:normal;text-align:right;font-weight:600}
+.bar{grid-column:1/3;height:6px;background:var(--in);border-radius:3px;overflow:hidden}.bar u{display:block;height:100%}
+.al{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;background:none;border:0;padding:7px 4px;border-radius:6px}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:8px}.f label{font-size:13px;color:var(--mut);display:block}.f input,.f select{width:100%}
+.sp{grid-column:1/3}
+textarea{width:100%;margin-top:8px;resize:vertical}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:14px}summary{cursor:pointer;font-weight:600}
+table{border-collapse:collapse;margin:8px 0}td,th{border-bottom:1px solid var(--line);padding:4px 12px 4px 0;text-align:left}
+input[type=range]{width:100%;padding:0}
+#qr{background:#fff;padding:4px;border-radius:6px}table button{padding:2px 8px}
+</style></head>
+<body><div class="w">
+<header><div><span class="tag">Demo data · NSS IIT Roorkee · Sociothon 2026</span><h1>Campus Waste Intelligence Dashboard</h1></div>
+<div class="ctl"><select id="loc" aria-label="Location"></select>
+<div class="seg" id="rng"><button data-d="7">7 days</button><button data-d="14" class="on">14 days</button><button data-d="28">28 days</button></div><label class="mut" style="align-self:center"><input type="checkbox" id="ap" style="width:auto"> Approved audits only</label></div></header>
+<section class="kpis" id="kpis"></section>
+<div class="r1">
+<div class="card"><h2>Daily waste by stream, with 7-day forecast</h2><div class="lg" id="lg"></div><svg id="ch" viewBox="0 0 700 270" role="img" aria-label="Stacked daily waste chart with forecast"></svg><p class="mut" id="fc"></p></div>
+<div class="card"><h2>Segregation leaderboard</h2><div id="lb"></div><p class="mut">Select a row to filter the whole dashboard.</p></div>
+</div>
+<div class="r2">
+<div class="card"><h2>Hotspot alerts</h2><div id="al"></div><textarea id="msg" rows="8" readonly aria-label="Generated message"></textarea><button id="cp" style="margin-top:6px">Copy message</button></div>
+<div class="card"><h2>Log a bin audit</h2><div class="f" id="fm"></div><p class="mut" id="ok"></p></div>
+<div class="card"><h2>What if segregation improves?</h2><label for="wi" class="mut">Improvement: <b id="wv">10</b> percentage points</label><input id="wi" type="range" min="0" max="25" value="10"><p id="wo" style="margin-top:10px"></p></div>
+</div>
+<div class='r2'><div class='card'><h2>Waste balance ledger (campus-wide)</h2><div id='ld'></div></div><div class='card'><h2>Audit records</h2><div id='rc'></div><div class='f' style='margin-top:8px'><div class='sp'><label for='sup'>Supervisor name (for approvals)</label><input id='sup'></div></div><button id='vf' style='margin-top:6px'>Verify record chain</button><p class='mut' id='vr'></p></div><div class='card'><h2>Batch tracking</h2><button id='mb' class='pri'>Create batches from approved audits</button><div id='bl'></div><div class='f' style='margin-top:8px'><div class='sp'><label for='bq'>Look up a batch ID (type or paste a scanned QR)</label><input id='bq'></div></div><div id='bd'></div></div><div class='card'><h2>Pilot smart weighing</h2><p id='sm' class='mut'></p><div class='f'><div><label for='rm'>Reference mass (kg)</label><input id='rm' type='number' value='5'></div><div><label>&nbsp;</label><button id='cl'>Calibrate</button></div><div><label for='wb'>Pilot bin</label><select id='wb'></select></div><div><label for='we'>Your estimate (kg)</label><input id='we' type='number'></div><button class='pri sp' id='wg'>Weigh bin</button></div><button id='sc' style='margin-top:6px'>Connect serial scale</button><p class='mut' id='ws'></p></div></div>
+<details><summary>Assumptions and how the numbers are made</summary>
+<p>All audits are generated demo data for 8 locations over 56 days. Replace them with real audits from your own photo checks before presenting any claim.</p>
+<table><tr><th>Stream</th><th>₹ per kg</th><th>kg CO₂e per kg</th></tr><tr><td>Food (compost)</td><td>2</td><td>0.5</td></tr><tr><td>Paper</td><td>12</td><td>1.0</td></tr><tr><td>Plastic</td><td>15</td><td>1.5</td></tr><tr><td>Metal/Glass</td><td>25</td><td>4.0</td></tr><tr><td>Other</td><td>0</td><td>0</td></tr></table>
+<p>These factors are illustrative placeholders, not sourced figures. Cite your own sources before the final demo.</p>
+<p><b>Segregation rate</b> is the weight-weighted share of audited waste in the correct bin. <b>Diversion</b> is correctly binned food, paper, plastic and metal as a share of all waste. <b>Windows</b> compare equal-length, non-overlapping periods (for example days 1 to 14 against the 14 days before them), so 7, 14 and 28 day views all have a comparison. <b>Forecast</b> uses that weekday’s average over the last 28 days, scaled by the last-7-day trend (limited to ±15%). The backtest hides the last 7 days, predicts them from earlier data only, and reports weighted error next to a “repeat last week” baseline. <b>Ledger</b>: collected = recycled + composted + rejected + disposed + unreconciled, using facility receipts from batch records; demo batches are seeded for older days. <b>Records</b> are stored in this browser only, with a hash chain for tamper checks. A real deployment needs server-side logins and storage.</p></details>
+</div>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'></script>
+<script>
+const CATS=["Food","Paper","Plastic","Metal/Glass","Other"],RATE=[2,12,15,25,0],CO2=[.5,1,1.5,4,0];
+const LOCS=[["Azad Bhawan",95,.22],["Cautley Bhawan",80,.28],["Govind Bhawan",88,.18],["Rajendra Bhawan",90,.30],["Ravindra Bhawan",70,.25],["Kasturba Bhawan",60,.12],["Central Canteen",180,.30],["Academic Block",55,.20]];
+const MIX=[[.45,.12,.25,.05,.13],[.7,.05,.15,.03,.07],[.1,.45,.3,.05,.1]];
+const $=s=>document.querySelector(s),f=n=>Math.round(n).toLocaleString("en-IN"),sum=a=>a.reduce((x,y)=>x+y,0),avg=a=>sum(a)/a.length;
+let s=7;const rnd=()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const N=56,today=new Date(),dt=d=>{const x=new Date(today);x.setDate(x.getDate()-(N-1-d));return x};
+const A=[];
+LOCS.forEach((L,li)=>{const m=MIX[li==6?1:li==7?2:0];for(let d=0;d<N;d++){const wd=dt(d).getDay(),w=(wd==0||wd==6)?(li==7?.35:1.12):1,tot=L[1]*w*(.9+rnd()*.2);
+A.push({l:li,d,st:'approved',kg:m.map(p=>tot*p*(.85+rnd()*.3)),c:Math.max(.04,L[2]-.08*d/N+(rnd()-.5)*.06+(li==3&&d>N-8?.1:0)+(li==4&&d>N-6?.07:0))})}});
+const SEED=A.length,B=[],SN=['Food','Paper','Plastic','Metal/Glass'],SC=['FD','PA','PL','MG'];
+for(let d=0;d<N-3;d++)for(let i=0;i<4;i++){let k=0;A.forEach(a=>{if(a.d==d)k+=a.kg[i]*(1-a.c)});const rc=k*(1-rnd()*.01);B.push({d,i,kg:k,rc,rj:rc*(.02+rnd()*.05),s:'received'})}
+const KEY='wcd:v2',S={recs:[],bat:[],cal:null,wl:[]};
+try{Object.assign(S,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){$('#ok').textContent='Browser storage is full or blocked. Records last for this session only.'}};
+const dayOf=ts=>N-1-Math.round((new Date(new Date().toDateString())-new Date(new Date(ts).toDateString()))/864e5);
+const use=a=>a.st!=='rejected'&&!(a.st==='pending'&&$('#ap').checked);
+const sync=()=>{A.length=SEED;S.recs.forEach(r=>{const d=dayOf(r.ts);if(d>=0)A.push({...r,d})})};sync();
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const med=a=>[...a].sort((x,y)=>x-y)[a.length>>1]||1;
+const H=async t=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)))].map(b=>b.toString(16).padStart(2,'0')).join('');
+const core=r=>JSON.stringify([r.id,r.ts,r.l,r.kg,r.c,r.by,r.evh,r.fl]);
+const shrink=file=>new Promise(res=>{if(!file)return res('');const i=new Image();i.onload=()=>{const k=Math.min(1,240/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.6))};i.onerror=()=>res('');i.src=URL.createObjectURL(file)});
+function recsUI(){const R=S.recs.slice(-6).reverse();$('#rc').innerHTML=R.length?'<table><tr><th>Time</th><th>Location</th><th>kg</th><th>Status</th><th></th></tr>'+R.map(r=>`<tr><td>${new Date(r.ts).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td><td>${LOCS[r.l][0]}</td><td>${f(sum(r.kg))}</td><td>${r.st}${r.fl?' ⚑':''}${r.ap?' by '+esc(r.ap.by):''}</td><td>${r.ev?`<img src='${r.ev}' alt='Evidence' width='28' height='28' style='vertical-align:middle;border-radius:4px'> `:''}${r.st=='pending'?`<button data-a='ok' data-id='${r.id}'>Approve</button> <button data-a='no' data-id='${r.id}'>Reject</button>`:''}</td></tr>`).join('')+'</table>':'<p class=mut>No saved audits yet. Add one with the form.</p>'}
+function ledger(days){const from=N-days,a=agg('all',from,N-1),D=a.cat[4]+sum(a.cat.slice(0,4))-a.rec,bs=[...B,...S.bat.map(b=>({...b,d:dayOf(b.ts)}))].filter(b=>b.d>=from&&b.d<=N-1);let rec=0,cmp=0,rej=0,bk=0,open=0;
+bs.forEach(b=>{bk+=b.kg;if(b.s=='received'){const ac=b.rc-b.rj;b.i?rec+=ac:cmp+=ac;rej+=b.rj}else open+=b.kg});open+=Math.max(0,a.rec-bk);
+const U=a.kg-rec-cmp-rej-D,gap=U-open,ok=Math.abs(gap)<=.02*a.kg,rows=[['Collected',a.kg],['Sorted (clean recoverables)',a.rec],['Recycled',rec],['Composted',cmp],['Rejected by facility',rej],['Disposed (other + contaminated)',D],['Unreconciled',U]];
+$('#ld').innerHTML=rows.map(([n,v])=>`<div class='lb' style='cursor:default'><span>${n}</span><em>${f(v)} kg</em><div class='bar'><u style='width:${a.kg?Math.max(0,v)/a.kg*100:0}%;background:var(--acc)'></u></div></div>`).join('')+`<p class='mut'>Collected = recycled + composted + rejected + disposed + unreconciled. Of the unreconciled kg, ${f(open)} kg is not yet batched or still awaiting receipt. The remaining gap is <b style='color:${ok?'var(--good)':'var(--bad)'}'>${f(gap)} kg (${a.kg?(gap/a.kg*100).toFixed(1):0}%)</b>: ${ok?'within the 2% tolerance.':'above the 2% tolerance, so check weighing and transit loss.'}</p>`}
+let cur='';const openB=id=>{cur=id;batUI()};
+function batUI(){$('#bl').innerHTML=S.bat.length?'<table><tr><th>Batch</th><th>kg</th><th>Status</th></tr>'+S.bat.slice(-5).reverse().map(b=>`<tr><td><button data-b='${b.id}'>${b.id}</button></td><td>${f(b.kg)}</td><td>${b.s}${b.flag?' ⚑':''}</td></tr>`).join('')+'</table>':'';
+const b=S.bat.find(x=>x.id==cur);if(!b){$('#bd').innerHTML='';return}
+let h=`<div style='display:flex;gap:10px;align-items:center;margin-top:8px'><div id='qr' style='width:92px;flex:none'></div><div class='mut'>${b.id}<br>${SN[b.i]}, ${f(b.kg)} kg clean from ${b.src.length} audit(s)<br>${b.veh?`Vehicle ${esc(b.veh)}, dispatched ${f(b.disp)} kg<br>`:''}${b.fac?`${esc(b.fac)} received ${f(b.rc)} kg, rejected ${f(b.rj)} kg<br>`:''}${b.flag?'⚑ '+b.flag:''}</div></div><p class='mut' id='bm'></p>`;
+if(b.s=='created')h+=`<div class='f'><div><label for='vh'>Vehicle number</label><input id='vh'></div><div><label for='dw'>Dispatch weight (kg)</label><input id='dw' type='number' value='${b.kg.toFixed(1)}'></div><button class='pri sp' data-go='d'>Record dispatch</button></div>`;
+if(b.s=='dispatched')h+=`<div class='f'><div class='sp'><label for='fc2'>Receiving facility</label><input id='fc2'></div><div><label for='rw'>Received (kg)</label><input id='rw' type='number'></div><div><label for='jw'>Rejected (kg)</label><input id='jw' type='number' value='0'></div><button class='pri sp' data-go='r'>Record receipt</button></div>`;
+$('#bd').innerHTML=h;try{const q=qrcode(0,'M');q.addData(b.id);q.make();$('#qr').innerHTML=q.createSvgTag(3,0)}catch(e){$('#qr').textContent='QR library blocked'}}
+let ser=null,sv=null;const reading=base=>ser&&sv!=null?[sv,'serial']:[base*(.9+Math.random()*.2),'simulated'];
+function scaleUI(){const c=S.cal,live=c&&c.ok&&Date.now()-c.ts<864e5,w=S.wl,n=w.length;
+$('#sm').innerHTML=(c?`Last calibration: ${(c.er*100).toFixed(2)}% error on a ${c.ref} kg mass (${c.src}). <b style='color:${live?'var(--good)':'var(--bad)'}'>${live?'Valid for 24 hours':c.ok?'Expired':'Failed: error must be within 1%'}</b>.`:'Not calibrated yet.')+(n?` ${n} weighings: your estimates differ from the scale by ${(avg(w.map(x=>Math.abs(x.v-x.est)/x.v))*100).toFixed(1)}% on average (bias ${(avg(w.map(x=>(x.est-x.v)/x.v))*100).toFixed(1)}%).`:'')+(c&&c.src=='simulated'||w.some(x=>x.src=='simulated')?' Simulated readings are not valid pilot evidence.':'')}
+function agg(loc,from,to){const r={kg:0,cat:[0,0,0,0,0],bad:0,val:0,co2:0,rec:0};
+for(const a of A){if(a.d<from||a.d>to||(loc!=="all"&&a.l!=loc)||!use(a))continue;const t=sum(a.kg);r.kg+=t;r.bad+=t*a.c;
+a.kg.forEach((k,i)=>{r.cat[i]+=k;if(i<4){const g=k*(1-a.c);r.rec+=g;r.val+=g*RATE[i];r.co2+=g*CO2[i]}})}
+r.seg=r.kg?1-r.bad/r.kg:0;r.div=r.kg?r.rec/r.kg:0;return r}
+const dayTot=(loc,d)=>{let t=0;for(const a of A)if(a.d==d&&(loc==="all"||a.l==loc)&&use(a))t+=sum(a.kg);return t};
+function pred(loc,end,t){const w=dt(t).getDay(),v=[];for(let d=Math.max(0,end-27);d<=end;d++)if(dt(d).getDay()==w){const x=dayTot(loc,d);if(x>0)v.push(x)}
+if(!v.length)return 0;const w7=k=>avg([...Array(7)].map((_,i)=>dayTot(loc,end-k-i))),l=w7(0),p=w7(7);
+return avg(v)*(p>0?Math.min(1.15,Math.max(.85,l/p)):1)}
+function backtest(loc){let e=0,nb=0,a=0;for(let t=N-7;t<N;t++){const x=dayTot(loc,t);e+=Math.abs(pred(loc,N-8,t)-x);nb+=Math.abs(dayTot(loc,t-7)-x);a+=x}return a>0?{m:e/a,b:nb/a}:null}
+const sel=()=>({loc:$("#loc").value,days:+$("#rng .on").dataset.d});
+const col=p=>p>=.8?"var(--good)":p>=.7?"var(--mid)":"var(--bad)";
+const pc=p=>(p*100).toFixed(0)+"%";
+function kpis(loc,days){const a=agg(loc,N-days,N-1),p=agg(loc,N-2*days,N-days-1),dl=p.kg?(a.seg-p.seg)*100:null;
+const K=[["Waste audited",f(a.kg)+" kg",f(a.kg/days)+" kg per day"],
+["Segregation rate",pc(a.seg),dl==null?"no earlier period":`<span style="color:${dl>=0?"var(--good)":"var(--bad)"}">${dl>=0?"▲":"▼"} ${Math.abs(dl).toFixed(1)} pts vs previous ${days} days</span>`],
+["Diverted from landfill",pc(a.div),f(a.rec)+" kg recovered"],["Recoverable value","₹"+f(a.val),"estimate, see assumptions"],["CO₂e avoided",f(a.co2)+" kg","estimate, see assumptions"]];
+$("#kpis").innerHTML=K.map(k=>`<div class="k"><span>${k[0]}</span><b>${k[1]}</b><i>${k[2]}</i></div>`).join("");return a}
+function chart(loc,days){const H=[];for(let d=N-days;d<N;d++){const c=[0,0,0,0,0];A.forEach(a=>{if(a.d==d&&(loc==="all"||a.l==loc)&&use(a))a.kg.forEach((k,i)=>c[i]+=k)});H.push({d,c})}
+const F=[...Array(7)].map((_,i)=>({d:N+i,v:pred(loc,N-1,N+i)})),n=H.length+7,W=700,pl=44,pb=26,pt=8,h=270-pb-pt,bw=(W-pl-6)/n;
+const mx=Math.max(...H.map(x=>sum(x.c)),...F.map(x=>x.v))*1.1,y=v=>pt+h-v/mx*h;let o="";
+for(let t=0;t<=4;t++){const v=mx*t/4;o+=`<line x1="${pl}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${pl-6}" y="${y(v)+4}" text-anchor="end">${f(v)}</text>`}
+const step=Math.ceil(n/9),lab=(d,i)=>i%step==0?`<text x="${pl+i*bw+bw/2}" y="262" text-anchor="middle">${dt(d).getDate()}/${dt(d).getMonth()+1}</text>`:"";
+H.forEach((x,i)=>{let base=0;x.c.forEach((v,k)=>{o+=`<rect x="${pl+i*bw+1}" y="${y(base+v)}" width="${bw-2}" height="${v/mx*h}" style="fill:var(--c${k+1})"><title>${CATS[k]}: ${f(v)} kg</title></rect>`;base+=v});o+=lab(x.d,i)});
+F.forEach((x,j)=>{const i=H.length+j;o+=`<rect x="${pl+i*bw+1}" y="${y(x.v)}" width="${bw-2}" height="${x.v/mx*h}" fill="var(--acc)" fill-opacity=".25" stroke="var(--acc)" stroke-dasharray="3 2"><title>Forecast: ${f(x.v)} kg</title></rect>`+lab(x.d,i)});
+const dx=pl+H.length*bw;o+=`<line x1="${dx}" x2="${dx}" y1="${pt}" y2="${pt+h}" stroke="var(--mut)" stroke-dasharray="4 3"/><text x="${dx+4}" y="${pt+10}">forecast</text>`;
+$("#ch").innerHTML=o;
+const bt=backtest(loc);$("#fc").innerHTML=`Next 7 days: about <b>${f(sum(F.map(x=>x.v)))} kg</b> expected. `+(bt?`Backtest on the last 7 days, predicted from earlier data only: error <b>${(bt.m*100).toFixed(1)}%</b>, versus ${(bt.b*100).toFixed(1)}% for repeating last week.`:'Not enough data to backtest.')}
+function board(days){const R=LOCS.map((L,i)=>({i,n:L[0],a:agg(i,N-days,N-1)})).sort((x,y)=>y.a.seg-x.a.seg);
+$("#lb").innerHTML=R.map(r=>`<button class="lb" data-i="${r.i}"><span>${r.n}</span><em style="color:${col(r.a.seg)}">${pc(r.a.seg)}</em><div class="bar"><u style="width:${r.a.seg*100}%;background:${col(r.a.seg)}"></u></div></button>`).join("")}
+function alerts(){const out=[];LOCS.forEach((L,i)=>{const a=agg(i,N-7,N-1),p=agg(i,N-14,N-8),dl=(a.seg-p.seg)*100;if(a.seg<.75||dl<-5)out.push({i,a,dl})});out.sort((x,y)=>x.a.seg-y.a.seg);
+$("#al").innerHTML=out.length?out.map(o=>`<button class="al" data-i="${o.i}"><span>${LOCS[o.i][0]}</span><span style="color:${col(o.a.seg)}">${pc(o.a.seg)} (${o.dl>=0?"+":""}${o.dl.toFixed(1)} pts)</span></button>`).join(""):"<p class=mut>No hotspots this week.</p>";
+if(out.length&&!$("#msg").value)nudge(out[0].i)}
+function nudge(i){const a=agg(i,N-7,N-1),p=agg(i,N-14,N-8),dl=(a.seg-p.seg)*100,top=a.cat.indexOf(Math.max(...a.cat));
+const lost=sum(a.cat.slice(0,4))-a.rec,lv=lost*(a.val/a.rec);
+$("#msg").value=`Subject: Segregation alert for ${LOCS[i][0]}\n\nHello ${LOCS[i][0]} committee,\n\nThis week’s bin audits show ${pc(a.seg)} correct segregation (${dl>=0?"+":""}${dl.toFixed(1)} points vs last week). The campus target is 85%.\n\nAbout ${f(lost)} kg of recyclable material was contaminated, worth roughly ₹${f(lv)}. The largest stream is ${CATS[top].toLowerCase()} (${f(a.cat[top])} kg).\n\nPlease remind residents about the wet and dry bins this week.\n\nCampus Waste Dashboard (demo data)`}
+function whatif(loc,days){const a=agg(loc,N-days,N-1),d=+$("#wi").value/100,rk=sum(a.cat.slice(0,4)),ex=rk*d,vk=a.val/a.rec,ck=a.co2/a.rec;$("#wv").textContent=$("#wi").value;
+$("#wo").innerHTML=`Over ${days} days: <b>${f(ex)} kg</b> more recovered, about <b>₹${f(ex*vk)}</b> and <b>${f(ex*ck)} kg CO₂e</b> avoided. That is ${f(ex*30/days)} kg less landfill per month.`}
+function render(){const {loc,days}=sel();kpis(loc,days);chart(loc,days);board(days);alerts();whatif(loc,days);ledger(days);recsUI();batUI();scaleUI()}
+$("#loc").innerHTML='<option value="all">All locations</option>'+LOCS.map((L,i)=>`<option value="${i}">${L[0]}</option>`).join("");
+$("#fm").innerHTML=`<div class="sp"><label for="fl">Location</label><select id="fl">${LOCS.map((L,i)=>`<option value="${i}">${L[0]}</option>`).join("")}</select></div>`+
+CATS.map((c,i)=>`<div><label for="q${i}">${c} (kg)</label><input id="q${i}" type="number" min="0" value="${[20,5,8,1,3][i]}"></div>`).join("")+
+`<div><label for="qc">Wrongly binned (%)</label><input id="qc" type="number" min="0" max="100" value="25"></div><div class="sp"><label for="by">Recorded by</label><input id="by"></div><div class="sp"><label for="ev">Photo evidence</label><input id="ev" type="file" accept="image/*"></div><button class="pri sp" id="ad">Save audit</button>`;
+$("#rng").onclick=e=>{if(e.target.dataset.d){document.querySelectorAll("#rng button").forEach(b=>b.classList.remove("on"));e.target.classList.add("on");render()}};
+$("#loc").onchange=render;$("#wi").oninput=()=>{const {loc,days}=sel();whatif(loc,days)};
+$("#lb").onclick=e=>{const b=e.target.closest(".lb");if(b){$("#loc").value=b.dataset.i;render()}};
+$("#al").onclick=e=>{const b=e.target.closest(".al");if(b)nudge(+b.dataset.i)};
+$("#cp").onclick=async()=>{try{await navigator.clipboard.writeText($("#msg").value);$("#cp").textContent="Copied"}catch(x){$("#msg").select();$("#cp").textContent="Select and copy"}setTimeout(()=>$("#cp").textContent="Copy message",1500)};
+$('#wb').innerHTML=LOCS.slice(0,5).map((L,i)=>`<option>${L[0]} bin ${i+1}</option>`).join('');$('#ap').onchange=render;
+$('#ad').onclick=async()=>{const l=+$('#fl').value,kg=CATS.map((_,i)=>parseFloat($('#q'+i).value)),c=parseFloat($('#qc').value)/100,by=$('#by').value.trim(),t=sum(kg),e=[];
+if(kg.some(v=>!isFinite(v)||v<0))e.push('Fill every weight with a number of 0 or more (use 0 if none).');else{if(t<=0)e.push('Total weight must be above 0 kg.');if(t>1000)e.push('A total above 1,000 kg is not plausible for one daily audit.')}
+if(!(c>=0&&c<=1))e.push('Wrongly binned must be between 0 and 100%.');if(!by)e.push('Enter who recorded the audit.');if(e.length){$('#ok').innerHTML=e.join('<br>');return}
+const m=med(A.slice(0,SEED).filter(a=>a.l==l).map(a=>sum(a.kg))),fl=t>2.5*m||t<.2*m?'weight outlier':'',ev=await shrink($('#ev').files[0]),prev=S.recs.length?S.recs[S.recs.length-1].h:'genesis',r={id:'A'+Date.now().toString(36),ts:Date.now(),l,kg,c,by,fl,ev,evh:ev?await H(ev):'',st:'pending'};
+r.h=await H(prev+core(r));S.recs.push(r);save();sync();$('#loc').value=l;$('#ok').textContent=`Saved ${f(t)} kg for ${LOCS[l][0]} as pending${fl?' (flagged: '+fl+')':''}. A supervisor must approve it.`;render()};
+$('#rc').onclick=async e=>{const b=e.target.closest('button[data-id]');if(!b)return;const r=S.recs.find(x=>x.id==b.dataset.id),sup=$('#sup').value.trim(),m=$('#vr');if(!r||!sup){m.textContent='Enter the supervisor name first.';return}
+if(b.dataset.a=='ok'){if(!r.ev){m.textContent='Approval needs photo evidence on the record.';return}if(sup.toLowerCase()==r.by.toLowerCase()){m.textContent='The supervisor must be a different person from the recorder.';return}r.st='approved'}else r.st='rejected';
+r.ap={by:sup,ts:Date.now()};r.ah=await H(r.h+r.st+sup+r.ap.ts);save();sync();m.textContent=`Record ${r.st} by ${sup}.`;render()};
+$('#vf').onclick=async()=>{let prev='genesis';const bad=[];for(const r of S.recs){if(await H(prev+core(r))!==r.h||(r.ev&&await H(r.ev)!==r.evh)||(r.ap&&await H(r.h+r.st+r.ap.by+r.ap.ts)!==r.ah))bad.push(r.id);prev=r.h}
+$('#vr').textContent=bad.length?`Tamper check failed for ${bad.length} record(s): ${bad.join(', ')}.`:`All ${S.recs.length} records match their hashes. This is a check inside your browser, not a signed audit trail.`};
+$('#mb').onclick=()=>{const rs=S.recs.filter(r=>r.st=='approved'&&!r.bd),dd=new Date().toISOString().slice(2,10).replace(/-/g,'');let made=0;
+for(let i=0;i<4;i++){const k=sum(rs.map(r=>r.kg[i]*(1-r.c)));if(k>0){S.bat.push({id:`B${dd}-${SC[i]}-${S.bat.length+1}`,ts:Date.now(),i,kg:k,src:rs.map(r=>r.id),s:'created'});made++}}
+if(!made){$('#bd').innerHTML='<p class=mut>No approved audits are waiting for a batch.</p>';return}rs.forEach(r=>r.bd=1);save();sync();cur=S.bat[S.bat.length-1].id;render()};
+$('#bl').onclick=e=>{const b=e.target.closest('button[data-b]');if(b)openB(b.dataset.b)};
+$('#bq').onchange=()=>{const id=$('#bq').value.trim();S.bat.some(b=>b.id==id)?openB(id):$('#bd').innerHTML='<p class=mut>No batch with that ID in this browser.</p>'};
+$('#bd').onclick=e=>{const g=e.target.dataset.go,b=S.bat.find(x=>x.id==cur),m=$('#bm');if(!g||!b)return;
+if(g=='d'){const v=$('#vh').value.trim(),w=parseFloat($('#dw').value);if(!v||!(w>0)){m.textContent='Enter a vehicle number and a dispatch weight above 0 kg.';return}b.veh=v;b.disp=w;b.s='dispatched';if(Math.abs(w-b.kg)>.03*b.kg)b.flag='dispatch weight differs from audit by over 3%'}
+else{const fa=$('#fc2').value.trim(),rw=parseFloat($('#rw').value),jw=parseFloat($('#jw').value);if(!fa||!(rw>=0)||!(jw>=0)||jw>rw||rw>b.disp*1.03){m.textContent='Enter the facility, a received weight no more than 3% above the dispatched weight, and a rejected weight between 0 and the received weight.';return}b.fac=fa;b.rc=rw;b.rj=jw;b.s='received';if(b.disp-rw>.03*b.disp)b.flag=(b.flag?b.flag+'; ':'')+'transit loss over 3%'}
+save();render()};
+$('#cl').onclick=()=>{const ref=parseFloat($('#rm').value);if(!(ref>0)){$('#ws').textContent='Enter the reference mass in kg.';return}const [v,src]=ser&&sv!=null?[sv,'serial']:[ref*(1+(Math.random()-.5)*.016),'simulated'],er=(v-ref)/ref;S.cal={ts:Date.now(),ref,v,er,src,ok:Math.abs(er)<=.01};save();$('#ws').textContent='';render()};
+$('#wg').onclick=()=>{const c=S.cal,est=parseFloat($('#we').value);if(!c||!c.ok||Date.now()-c.ts>864e5){$('#ws').textContent='Calibrate within the last 24 hours, with error within 1%, before weighing.';return}if(!(est>0)){$('#ws').textContent='Enter your own estimate in kg so the scale can be compared.';return}const [v,src]=reading(est);S.wl.push({ts:Date.now(),bin:$('#wb').value,v,est,src});save();$('#ws').textContent='';render()};
+$('#sc').onclick=async()=>{try{const p=await navigator.serial.requestPort();await p.open({baudRate:9600});ser=p;$('#ws').textContent='Scale connected.';const rd=p.readable.pipeThrough(new TextDecoderStream()).getReader();let buf='';for(;;){const {value,done}=await rd.read();if(done)break;buf+=value;const m=buf.match(/(-?\d+(?:\.\d+)?)\s*kg/gi);if(m){sv=parseFloat(m[m.length-1]);buf=buf.slice(-20)}}}catch(e){$('#ws').textContent='Serial scale unavailable here ('+(e.name||'error')+'). Open a copy in Chrome or Edge with a scale attached; simulated readings stay on until then.'}};
+render();
+</script></body></html>
